@@ -1,101 +1,156 @@
-import Image from "next/image";
+"use client"; // Add this directive at the top of your component
 
-export default function Home() {
+import { useState } from "react";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import axios from "axios";
+
+// Validation Schema using Yup
+const validationSchema = Yup.object({
+  name: Yup.string().required("Name is required"),
+  contact: Yup.string()
+    .matches(/^[0-9]{10}$/, "Contact number must be exactly 10 digits")
+    .required("Contact number is required"),
+  eventDescription: Yup.string().required("Event description is required"),
+  boxesRequired: Yup.number()
+    .positive("Boxes required must be a positive number")
+    .required("Boxes required is required")
+    .integer("Boxes required must be an integer"),
+});
+
+const Home = () => {
+  const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+
+  // Form submit handler to send data to backend
+  const handleSubmit = async (values: any) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        alert('Order placed successfully');
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      setSubmissionStatus("Error placing order. Please try again.");
+    }
+  };
+  
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <header className="text-center sm:text-left mb-10">
+        <h1 className="text-3xl sm:text-5xl font-bold text-gray-800 dark:text-white">
+          Sri Maaruthi Sweets
+        </h1>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+          Order your favorite sweets for your special events.
+        </p>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+        <Formik
+          initialValues={{
+            name: "",
+            contact: "",
+            eventDescription: "",
+            boxesRequired: 1,
+          }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          <Form className="flex flex-col gap-6 max-w-lg w-full bg-white p-8 rounded-lg shadow-md dark:bg-gray-800">
+            <div>
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Name
+              </label>
+              <Field
+                id="name"
+                name="name"
+                type="text"
+                className="mt-2 p-2 w-full border border-gray-300 rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-700"
+                placeholder="Enter your name"
+              />
+              <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
+            </div>
+
+            <div>
+              <label htmlFor="contact" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Contact
+              </label>
+              <Field
+                id="contact"
+                name="contact"
+                type="tel"
+                className="mt-2 p-2 w-full border border-gray-300 rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-700"
+                placeholder="Enter your contact number"
+              />
+              <ErrorMessage name="contact" component="div" className="text-red-500 text-sm" />
+            </div>
+
+            <div>
+              <label htmlFor="event-description" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Describe your event
+              </label>
+              <Field
+                id="event-description"
+                name="eventDescription"
+                as="textarea"
+                className="mt-2 p-2 w-full border border-gray-300 rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-700"
+                placeholder="Tell us about your event"
+                rows={4}
+              />
+              <ErrorMessage name="eventDescription" component="div" className="text-red-500 text-sm" />
+            </div>
+
+            <div>
+              <label htmlFor="boxes-required" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Boxes Required
+              </label>
+              <Field
+                id="boxes-required"
+                name="boxesRequired"
+                type="number"
+                className="mt-2 p-2 w-full border border-gray-300 rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-700"
+                placeholder="Enter number of boxes"
+              />
+              <ErrorMessage name="boxesRequired" component="div" className="text-red-500 text-sm" />
+            </div>
+
+            <button
+              type="submit"
+              className="mt-4 w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              Submit
+            </button>
+
+            {submissionStatus && (
+              <div className={`mt-4 text-center text-sm ${submissionStatus.includes("Error") ? "text-red-500" : "text-green-500"}`}>
+                {submissionStatus}
+              </div>
+            )}
+          </Form>
+        </Formik>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="row-start-3 flex flex-col items-center gap-6 sm:flex-row sm:gap-16 text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-center sm:text-left">
+          <p className="font-semibold text-gray-800 dark:text-white">Sri Maaruthi Sweets</p>
+          <p className="text-gray-600 dark:text-gray-300">Ravulapalem</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Contact: <a href="tel:+919989325599" className="text-blue-500 hover:underline">9989325599</a>
+          </p>
+        </div>
       </footer>
     </div>
   );
-}
+};
+
+export default Home;
