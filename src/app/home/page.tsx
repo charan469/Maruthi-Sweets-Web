@@ -13,7 +13,7 @@ const products = [
     { id: 2, name: "Panchadhara Dry Fruits Putharekulu [8 Pcs]", price: 150, image: putharekuluImage2 },
     { id: 3, name: "Boost Putharekulu", price: 180, image: putharekuluImage },
 ];
-
+//empty commit
 const Home = () => {
     const dispatch = useDispatch();
     const cart = useSelector((state) => state.cart.cart);
