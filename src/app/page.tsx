@@ -24,7 +24,7 @@ const App = () => {
   // Form submit handler to send data to backend
   const handleSubmit = async (values: any) => {
     try {
-      const response = await fetch('http://localhost:5000/api/orders', {
+      const response = await fetch('http://65.1.3.24:5000/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

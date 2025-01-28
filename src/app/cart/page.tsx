@@ -59,7 +59,7 @@ const Cart = () => {
       orderDate: new Date().toISOString(),
     };
     try {
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch("http://65.1.3.24:5000/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderDetails),
