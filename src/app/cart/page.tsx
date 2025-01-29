@@ -5,6 +5,7 @@ import { removeItemFromCart, updateItemQuantity } from "../../redux/actions/cart
 import Header from "../header/page";
 import { saveOrder } from "@/redux/reducers/orderHistoryReducer";
 import Script from "next/script";
+import { useRouter } from "next/navigation"; 
 
 declare global {
   interface Window{
@@ -15,6 +16,7 @@ declare global {
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const cart = useSelector((state) => state.cart.cart);
   const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
@@ -59,7 +61,7 @@ const Cart = () => {
       orderDate: new Date().toISOString(),
     };
     try {
-      const response = await fetch("http://65.1.3.24:5000/api/orders", {
+      const response = await fetch("https://api.maruthi-sweets.com/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderDetails),
@@ -72,6 +74,7 @@ const Cart = () => {
         // Clear the cart
         cart.forEach((item) => dispatch(removeItemFromCart(item.name)));
         alert("Order placed successfully!");
+        router.push("/history");
       } else {
         console.error("Error placing order:", data.message);
         alert("Failed to place order. Please try again.");
