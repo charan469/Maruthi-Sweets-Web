@@ -6,9 +6,9 @@ export const UPDATE_QUANTITY = 'UPDATE_QUANTITY';
 
 // Action to add item to the cart
 interface CartItem {
-    id: number;
-    name: string;
-    price: number;
+    product_id: number;
+    product_name: string;
+    product_price: number;
     quantity: number;
 }
 

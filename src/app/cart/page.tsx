@@ -1,32 +1,31 @@
-"use client"; // Next.js-specific directive
+"use client"
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeItemFromCart, updateItemQuantity } from "../../redux/actions/cartActions";
-import Header from "../header/page";
+import { removeItemFromCart } from "../../redux/actions/cartActions";
 import { saveOrder } from "@/redux/reducers/orderHistoryReducer";
+import Header from "../header/page";
 import Script from "next/script";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
+import CartItem from "../components/CartItem";
+import DeliveryDetails from "../components/DeliveryDetails";
+import CartTotal from "../components/CartTotal";
+import PlaceOrderButton from "../components/PlaceOrderButton";
+import Loader from "../components/Loader"; // Import the loader component
 
-declare global {
-  interface Window{
-    Razorpay: any;
-  }
-}
-
+// Razorpay declaration...
 
 const Cart = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const cart = useSelector((state) => state.cart.cart);
-  const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const customer = useSelector((state: { customer: { name: string; mobile_number: string } }) => state.customer);
+  const cart = useSelector((state: { cart: { cart: { product_id: string; product_name: string; product_price: number; quantity: number; }[] } }) => state.cart.cart);
+  const totalPrice = cart.reduce((total, item) => total + item.product_price * item.quantity, 0);
 
-  const [customerName, setCustomerName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
+  const [customerName, setCustomerName] = useState(customer.name);
+  const [mobileNumber, setMobileNumber] = useState(customer.mobile_number);
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedDeliveryPoint, setSelectedDeliveryPoint] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState(
-    new Date().toISOString().split("T")[0] // Today's date as default
-  );
+  const [deliveryDate, setDeliveryDate] = useState(new Date().toISOString().split("T")[0]);
 
   const cities = [
     { name: "Hyderabad", deliveryPoints: ["JNTU", "MG Bus Stand", "Miyapur"] },
@@ -34,11 +33,6 @@ const Cart = () => {
     { name: "Bangalore", deliveryPoints: ["Majestic", "KR Market", "Electronic City"] },
   ];
 
-  const handleCityChange = (city) => {
-    setSelectedCity(city);
-    const cityData = cities.find((c) => c.name === city);
-    setSelectedDeliveryPoint("");
-  };
 
   const handlePlaceOrder = async () => {
     if (!customerName || !mobileNumber || !selectedCity || !selectedDeliveryPoint) {
@@ -59,9 +53,10 @@ const Cart = () => {
       sellerPhone: "9989325599",
       totalPrice,
       orderDate: new Date().toISOString(),
+      orderStatus: "placed",
     };
     try {
-      const response = await fetch("https://api.maruthi-sweets.com/api/orders", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderDetails),
@@ -72,7 +67,7 @@ const Cart = () => {
         console.log("Order placed successfully:", data.order);
         dispatch(saveOrder(orderDetails)); // Dispatch action to save order in Redux
         // Clear the cart
-        cart.forEach((item) => dispatch(removeItemFromCart(item.name)));
+        cart.forEach((item) => dispatch(removeItemFromCart(item.product_name)));
         alert("Order placed successfully!");
         router.push("/history");
       } else {
@@ -84,8 +79,6 @@ const Cart = () => {
       alert("Failed to place order. Please try again.");
     }
   };
-
-
 
   const [isProcessing, setIsProcessing] = useState(false);
   const handlePayment = async () => {
@@ -138,7 +131,7 @@ const Cart = () => {
             });
             const paymentData = await paymentVerificationResponse.json();
             if (paymentData.message === "Payment successful") {
-              alert("Payment successful");
+              //alert("Payment successful");
               handlePlaceOrder();
             } else {
               alert("Payment failed. Please try again.");
@@ -169,7 +162,7 @@ const Cart = () => {
   return (
     <div>
       <Header />
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 min-h-screen relative">
         <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         {cart.length === 0 ? (
@@ -178,95 +171,29 @@ const Cart = () => {
           <>
             <div className="mb-6">
               {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between items-center bg-white p-4 rounded shadow mb-4"
-                >
-                  <p className="font-semibold">{item.name}</p>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      className="px-2 py-1 bg-red-500 text-white rounded"
-                      onClick={() => dispatch(updateItemQuantity(item, item.quantity - 1))}
-                    >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      className="px-2 py-1 bg-red-500 text-white rounded"
-                      onClick={() => dispatch(updateItemQuantity(item, item.quantity + 1))}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
+                <CartItem key={item.product_id} {...item} />
               ))}
             </div>
-
-            <div className="bg-white p-6 rounded shadow mb-6">
-              <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
-              <input
-                type="text"
-                placeholder="Customer Name"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border rounded"
-              />
-              <input
-                type="text"
-                placeholder="Mobile Number"
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border rounded"
-              />
-              <select
-                value={selectedCity}
-                onChange={(e) => handleCityChange(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border rounded"
-              >
-                <option value="">Select City</option>
-                {cities.map((city) => (
-                  <option key={city.name} value={city.name}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
-              {selectedCity && (
-                <select
-                  value={selectedDeliveryPoint}
-                  onChange={(e) => setSelectedDeliveryPoint(e.target.value)}
-                  className="w-full mb-4 px-3 py-2 border rounded"
-                >
-                  <option value="">Select Delivery Point</option>
-                  {cities
-                    .find((city) => city.name === selectedCity)
-                    ?.deliveryPoints.map((point) => (
-                      <option key={point} value={point}>
-                        {point}
-                      </option>
-                    ))}
-                </select>
-              )}
-              <input
-                type="date"
-                value={deliveryDate}
-                onChange={(e) => setDeliveryDate(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
-              />
-            </div>
-
-            <div className="flex justify-between items-center bg-white p-4 rounded shadow mb-6">
-              <span>Total:</span>
-              <span className="font-semibold">Rs. {totalPrice}</span>
-            </div>
-
-            <button
-              onClick={handlePayment}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg"
-            >
-              Place Order
-            </button>
+            <DeliveryDetails
+              customerName={customerName}
+              mobileNumber={mobileNumber}
+              selectedCity={selectedCity}
+              selectedDeliveryPoint={selectedDeliveryPoint}
+              deliveryDate={deliveryDate}
+              setCustomerName={setCustomerName}
+              setMobileNumber={setMobileNumber}
+              setSelectedCity={setSelectedCity}
+              setSelectedDeliveryPoint={setSelectedDeliveryPoint}
+              setDeliveryDate={setDeliveryDate}
+              cities={cities}
+            />
+            <CartTotal totalPrice={totalPrice} />
+            <PlaceOrderButton handlePayment={handlePayment} isProcessing={isProcessing} />
           </>
         )}
+        
+        {/* Show loader when isProcessing is true */}
+        {isProcessing && <Loader />}
       </div>
     </div>
   );

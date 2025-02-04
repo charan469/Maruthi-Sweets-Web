@@ -2,13 +2,28 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../header/page";
+import { useSelector } from "react-redux";
 
-const baseUrl = "https://api.maruthi-sweets.com/api/get-all-orders";
+
+interface Order {
+    order_id: string;
+    order_date: string;
+    name: string;
+    city: string;
+    delivery_point: string;
+    delivery_date: string;
+    mobile_number: string;
+    cart_items: { product_name: string; quantity: number; product_price: number }[];
+    total_price: number;
+    order_status: string;
+}
 
 const OrderHistory = () => {
-    const [orderHistory, setOrderHistory] = useState([]);
+    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_URL}get-customer-orders`;
+    const customer = useSelector((state: RootState) => state.customer);
+    const [orderHistory, setOrderHistory] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState("");
 
     const fetchOrders = async () => {
         try {
@@ -16,6 +31,9 @@ const OrderHistory = () => {
                 headers: {
                     "Cache-Control": "no-cache",
                 },
+                params: {
+                    mobileNumber: customer.mobile_number
+                }
             });
             setOrderHistory(response.data);
         } catch (err) {
@@ -41,7 +59,7 @@ const OrderHistory = () => {
     // const handleDeleteAll = async () => {
     //     const confirmDelete = window.confirm("Are you sure you want to delete all orders and customers?");
     //     if (!confirmDelete) return;
-    
+
     //     try {
     //       const response = await axios.delete("http://localhost:5000/api/delete-all");
     //       alert(response.data.message);
@@ -72,12 +90,13 @@ const OrderHistory = () => {
                             Delivery Address: {order?.city}, {order?.delivery_point}
                         </p>
                         <p>Delivery Date: {order?.delivery_date}</p>
+                        <p>Order Status: {order?.order_status}</p>
                         <p>Customer Contact: {order.mobile_number}</p>
                         <div>
                             <strong>Items:</strong>
                             {order.cart_items.map((item, idx) => (
                                 <p key={idx}>
-                                    {item.name} x {item.quantity} = Rs. {item.price * item.quantity}
+                                    {item.product_name} x {item.quantity} = Rs. {item.product_price * item.quantity}
                                 </p>
                             ))}
                         </div>

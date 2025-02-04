@@ -7,7 +7,14 @@ import {  useSelector } from 'react-redux';
 import { History, ShoppingCart } from 'lucide-react';
 
 const Header: React.FC = () => {
-    const cart = useSelector((state) => state.cart.cart);
+    interface CartItem {
+        id: number;
+        name: string;
+        quantity: number;
+        price: number;
+    }
+
+    const cart = useSelector((state: { cart: { cart: CartItem[] } }) => state.cart.cart);
 
     return (
         <header className="flex items-center justify-between px-4 py-3 bg-white shadow-md">

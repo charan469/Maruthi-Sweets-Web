@@ -5,48 +5,49 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import Home from "./home/page";
+import Login from "./login/page";
 
-// Validation Schema using Yup
-const validationSchema = Yup.object({
-  name: Yup.string().required("Name is required"),
-  contact: Yup.string()
-    .matches(/^[0-9]{10}$/, "Contact number must be exactly 10 digits")
-    .required("Contact number is required"),
-  eventDescription: Yup.string().required("Event description is required"),
-  boxesRequired: Yup.number()
-    .positive("Boxes required must be a positive number")
-    .required("Boxes required is required")
-    .integer("Boxes required must be an integer"),
-});
+// // Validation Schema using Yup
+// const validationSchema = Yup.object({
+//   name: Yup.string().required("Name is required"),
+//   contact: Yup.string()
+//     .matches(/^[0-9]{10}$/, "Contact number must be exactly 10 digits")
+//     .required("Contact number is required"),
+//   eventDescription: Yup.string().required("Event description is required"),
+//   boxesRequired: Yup.number()
+//     .positive("Boxes required must be a positive number")
+//     .required("Boxes required is required")
+//     .integer("Boxes required must be an integer"),
+// });
 
 const App = () => {
-  const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
-  // Form submit handler to send data to backend
-  const handleSubmit = async (values: any) => {
-    try {
-      const response = await fetch('https://api.maruthi-sweets.com/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
+  // const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  // // Form submit handler to send data to backend
+  // const handleSubmit = async (values: any) => {
+  //   try {
+  //     const response = await fetch('https://api.maruthi-sweets.com/api/orders', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(values),
+  //     });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert('Order placed successfully');
-      } else {
-        alert(`Error: ${data.message}`);
-      }
-    } catch (error) {
-      setSubmissionStatus("Error placing order. Please try again.");
-    }
-  };
+  //     const data = await response.json();
+  //     if (response.ok) {
+  //       alert('Order placed successfully');
+  //     } else {
+  //       alert(`Error: ${data.message}`);
+  //     }
+  //   } catch (error) {
+  //     setSubmissionStatus("Error placing order. Please try again.");
+  //   }
+  // };
 
 
   return (
     <div>
-      <Home />
+      <Login />
       {/* <Formik
         initialValues={{
           name: "",
