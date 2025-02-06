@@ -11,6 +11,7 @@ import DeliveryDetails from "../components/DeliveryDetails";
 import CartTotal from "../components/CartTotal";
 import PlaceOrderButton from "../components/PlaceOrderButton";
 import Loader from "../components/Loader"; // Import the loader component
+import Link from 'next/link';
 
 // Razorpay declaration...
 
@@ -19,7 +20,9 @@ const Cart = () => {
   const router = useRouter();
   const customer = useSelector((state: { customer: { name: string; mobile_number: string } }) => state.customer);
   const cart = useSelector((state: { cart: { cart: { product_id: string; product_name: string; product_price: number; quantity: number; }[] } }) => state.cart.cart);
-  const totalPrice = cart.reduce((total, item) => total + item.product_price * item.quantity, 0);
+  const [deliveryCharges, setDeliveryCharges] = useState(0)
+  const itemsPrice =  cart.reduce((total, item) => total + item.product_price * item.quantity, 0);
+  const totalPrice = cart.reduce((total, item) => total + (item.product_price * item.quantity) + deliveryCharges, 0);
 
   const [customerName, setCustomerName] = useState(customer.name);
   const [mobileNumber, setMobileNumber] = useState(customer.mobile_number);
@@ -27,10 +30,11 @@ const Cart = () => {
   const [selectedDeliveryPoint, setSelectedDeliveryPoint] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(new Date().toISOString().split("T")[0]);
 
+
   const cities = [
-    { name: "Hyderabad", deliveryPoints: ["JNTU", "MG Bus Stand", "Miyapur"] },
-    { name: "Chennai", deliveryPoints: ["Koyambedu", "Tambaram", "Guindy"] },
-    { name: "Bangalore", deliveryPoints: ["Majestic", "KR Market", "Electronic City"] },
+    { name: "Hyderabad", deliveryPoints: ["JNTU", "MG Bus Stand", "Miyapur"], deliveryCharges:100 },
+    { name: "Chennai", deliveryPoints: ["Koyambedu", "Tambaram", "Guindy"],  deliveryCharges:150 },
+    { name: "Bangalore", deliveryPoints: ["Majestic", "KR Market", "Electronic City"], deliveryCharges:200 },
   ];
 
 
@@ -151,10 +155,10 @@ const Cart = () => {
       };
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch (error) { 
+    } catch (error) {
       console.error("payment failed:", error);
       alert("payment failed. Please try again.");
-    } finally{
+    } finally {
       setIsProcessing(false);
     }
   }
@@ -163,10 +167,19 @@ const Cart = () => {
     <div>
       <Header />
       <div className="p-6 bg-gray-50 min-h-screen relative">
-        <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+        <h1 className="text-2xl font-bold mb-4">Cart</h1>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         {cart.length === 0 ? (
-          <p>Your cart is empty.</p>
+          <div className="flex flex-col items-center justify-center h-full">
+            <p className="text-center text-gray-600">Your cart is empty.</p>
+            <Link href="/home">
+              <button className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all">
+                Home
+              </button>
+            </Link>
+          </div>
+
+
         ) : (
           <>
             <div className="mb-6">
@@ -186,12 +199,15 @@ const Cart = () => {
               setSelectedDeliveryPoint={setSelectedDeliveryPoint}
               setDeliveryDate={setDeliveryDate}
               cities={cities}
+              deliveryCharges={deliveryCharges}
+              setDeliveryCharges={setDeliveryCharges}
+              itemsPrice={itemsPrice}
             />
             <CartTotal totalPrice={totalPrice} />
             <PlaceOrderButton handlePayment={handlePayment} isProcessing={isProcessing} />
           </>
         )}
-        
+
         {/* Show loader when isProcessing is true */}
         {isProcessing && <Loader />}
       </div>

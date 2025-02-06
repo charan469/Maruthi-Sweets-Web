@@ -24,6 +24,7 @@ interface CartItem {
 
 const Home = () => {
     const dispatch = useDispatch();
+    const customer = useSelector((state: { customer: { name: string; mobile_number: string } }) => state.customer);
     const cart = useSelector((state: { cart: { cart: CartItem[] } }) => state.cart.cart);
     const baseUrl = `${process.env.NEXT_PUBLIC_BASE_URL}get-available-products`;    
     const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
@@ -88,6 +89,7 @@ const Home = () => {
 
             {/* Product List */}
             <main className="px-4 py-6">
+            <h2 className="text-xl font-semibold mb-4">Hi {customer.name}</h2>
                 <h2 className="text-xl font-semibold text-center mb-4">Our Sweets</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {availableProducts.map((product) => {

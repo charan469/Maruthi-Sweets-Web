@@ -1,8 +1,16 @@
-// /redux/store.ts
+import { createStore } from "redux";
+import rootReducer from "./reducers/rootReducer";
+import { persistStore, persistReducer } from "redux-persist";
+import storageSession from "redux-persist/lib/storage/session"; // Use sessionStorage
 
-import { createStore } from 'redux';
-import rootReducer from './reducers/rootReducer';
+const persistConfig = {
+  key: "root",
+  storage: storageSession, // Change to "storage" for localStorage (persistent even after tab close)
+};
 
-const store = createStore(rootReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export default store;
+const store = createStore(persistedReducer);
+const persistor = persistStore(store);
+
+export { store, persistor };
