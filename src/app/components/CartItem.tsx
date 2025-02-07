@@ -6,27 +6,34 @@ interface CartItemProps {
   product_id: string;
   product_name: string;
   product_price: number;
+  product_image_url: string
   quantity: number;
 }
 
 const CartItem = (cartItem: CartItemProps) => {
-  const { product_id, product_name, product_price, quantity } = cartItem
+  const { product_id, product_name, product_price, product_image_url, quantity } = cartItem
   const dispatch = useDispatch();
-    const handleIncreaseQuantity = () => {
-        if (cartItem) {
-          dispatch(updateItemQuantity({ product_id, product_name, product_price, quantity }, quantity + 1));
-        }
-    };
+  const handleIncreaseQuantity = () => {
+    if (cartItem) {
+      dispatch(updateItemQuantity({ product_id, product_name, product_price, quantity }, quantity + 1));
+    }
+  };
 
-    const handleDecreaseQuantity = () => {
-        if (cartItem && cartItem.quantity === 1) {
-            dispatch(removeItemFromCart(product_name));
-        } else if (cartItem) {
-          dispatch(updateItemQuantity({ product_id, product_name, product_price, quantity }, quantity - 1));
-        }
-    };
+  const handleDecreaseQuantity = () => {
+    if (cartItem && cartItem.quantity === 1) {
+      dispatch(removeItemFromCart(product_name));
+    } else if (cartItem) {
+      dispatch(updateItemQuantity({ product_id, product_name, product_price, quantity }, quantity - 1));
+    }
+  };
   return (
     <div className="flex justify-between items-center bg-white p-4 rounded shadow mb-4">
+
+      <img
+        src={product_image_url}
+        alt={product_name}
+        className="w-20 h-20 object-cover rounded"
+      />
       <p className="font-semibold">{product_name}</p>
       <div className="flex items-center space-x-2">
         <button

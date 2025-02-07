@@ -13,7 +13,7 @@ interface Order {
     delivery_point: string;
     delivery_date: string;
     mobile_number: string;
-    cart_items: { product_name: string; quantity: number; product_price: number }[];
+    cart_items: { product_name: string; quantity: number; product_price: number; product_image_url: string }[];
     total_price: number;
     order_status: string;
 }

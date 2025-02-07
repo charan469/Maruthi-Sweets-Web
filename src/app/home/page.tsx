@@ -61,7 +61,7 @@ const Home = () => {
     }
 
 
-    const handleAddItem = (product: { product_id: number; product_name: string; product_price: number; product_image_url: StaticImageData }) => {
+    const handleAddItem = (product: { product_id: number; product_name: string; product_price: number; product_image_url: string }) => {
         dispatch(addItemToCart(product));
     };
 
@@ -99,11 +99,11 @@ const Home = () => {
                                 <div className="flex items-center justify-center">
                                     <div className="w-32 h-32 ">
                                         {/* Set fixed dimensions for the image container */}
-                                        {/* <Image
+                                        <img
                                             src={product.product_image_url}
                                             alt={product.product_name}
                                             className="w-full h-full object-cover rounded"
-                                        /> */}
+                                        />
                                     </div>
                                 </div>
                                 <h3 className="text-sm font-semibold mt-2 text-center">{product.product_name}</h3>

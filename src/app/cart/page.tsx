@@ -19,7 +19,7 @@ const Cart = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const customer = useSelector((state: { customer: { name: string; mobile_number: string } }) => state.customer);
-  const cart = useSelector((state: { cart: { cart: { product_id: string; product_name: string; product_price: number; quantity: number; }[] } }) => state.cart.cart);
+  const cart = useSelector((state: { cart: { cart: { product_id: string; product_name: string; product_price: number; product_image_url: string; quantity: number; }[] } }) => state.cart.cart);
   const [deliveryCharges, setDeliveryCharges] = useState(0)
   const itemsPrice =  cart.reduce((total, item) => total + item.product_price * item.quantity, 0);
   const totalPrice = cart.reduce((total, item) => total + (item.product_price * item.quantity) + deliveryCharges, 0);
