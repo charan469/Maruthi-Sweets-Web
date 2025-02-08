@@ -4,6 +4,7 @@ import axios from "axios";
 import Header from "../header/page";
 import { useSelector } from "react-redux";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Order {
     order_id: string;
@@ -75,13 +76,21 @@ const OrderHistory: React.FC = () => {
     //   };
 
     return (
-        <div style={styles.container}>
+        <div>
             <Header />
+            <h1 className="text-2xl font-bold m-4">Order History</h1>
             {/* <button onClick={handleDeleteAll} style={{ background: "red", color: "white", padding: "10px", cursor: "pointer" }}>
         Delete All Orders & Customers
       </button> */}
             {orderHistory.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full">
                 <p style={styles.emptyText}>No orders found.</p>
+                <Link href="/home">
+              <button className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all">
+                Home
+              </button>
+            </Link>
+            </div>
             ) : (
                 orderHistory.map((order) => (
                     <div key={order.order_id} style={styles.orderCard}>
@@ -124,9 +133,6 @@ const OrderHistory: React.FC = () => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    container: {
-        padding: "10px",
-    },
     loadingText: {
         textAlign: "center",
         fontSize: "18px",

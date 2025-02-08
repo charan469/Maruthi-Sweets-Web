@@ -5,6 +5,7 @@ interface DeliveryDetailsProps {
   selectedCity: string;
   selectedDeliveryPoint: string;
   deliveryDate: string;
+  getMinDeliveryDate: () => string;
   setCustomerName: (name: string) => void;
   setMobileNumber: (number: string) => void;
   setSelectedCity: (city: string) => void;
@@ -13,7 +14,7 @@ interface DeliveryDetailsProps {
   cities: { name: string; deliveryPoints: string[], deliveryCharges: number }[];
   deliveryCharges: number;
   setDeliveryCharges: (number: number) => void;
-  itemsPrice:number
+  itemsPrice: number
 }
 
 const DeliveryDetails = ({
@@ -22,6 +23,7 @@ const DeliveryDetails = ({
   selectedCity,
   selectedDeliveryPoint,
   deliveryDate,
+  getMinDeliveryDate,
   setCustomerName,
   setMobileNumber,
   setSelectedCity,
@@ -86,16 +88,16 @@ const DeliveryDetails = ({
       <input
         type="date"
         value={deliveryDate}
+        min={getMinDeliveryDate()} // Lock to at least 48 hours later
         onChange={(e) => setDeliveryDate(e.target.value)}
         className="w-full px-3 py-2 border rounded"
       />
       {deliveryCharges !== 0 &&
-      <div className="flex f-row justify-between pt-4"><h2 className="font-bold">items cost: </h2> <p>Rs.{itemsPrice}</p></div>
+        <div className="flex f-row justify-between pt-4"><h2 className="font-bold">items cost: </h2> <p>Rs.{itemsPrice}</p></div>
       }
       {deliveryCharges !== 0 &&
-      <div className="flex f-row justify-between pt-4"><h2 className="font-bold">Delivery Charges: </h2> <p>Rs.{deliveryCharges}</p></div>
+        <div className="flex f-row justify-between pt-4"><h2 className="font-bold">Delivery Charges: </h2> <p>Rs.{deliveryCharges}</p></div>
       }
-      
     </div>
   );
 };

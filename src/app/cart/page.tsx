@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart } from "../../redux/actions/cartActions";
 import { saveOrder } from "@/redux/reducers/orderHistoryReducer";
@@ -13,28 +13,69 @@ import PlaceOrderButton from "../components/PlaceOrderButton";
 import Loader from "../components/Loader"; // Import the loader component
 import Link from 'next/link';
 
-// Razorpay declaration...
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpayResponse) => Promise<void>;
+  prefill: {
+    name: string;
+    contact: string;
+  };
+  theme: {
+    color: string;
+  };
+}
 
+interface RazorpayResponse {
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+interface RootState {
+  customer: { name: string; mobile_number: string };
+  cart: { cart: { product_id: string; product_name: string; product_price: number; product_image_url: string; quantity: number; }[] };
+}
 const Cart = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const customer = useSelector((state: { customer: { name: string; mobile_number: string } }) => state.customer);
-  const cart = useSelector((state: { cart: { cart: { product_id: string; product_name: string; product_price: number; product_image_url: string; quantity: number; }[] } }) => state.cart.cart);
+  const customer = useSelector((state: RootState) => state.customer);
+  const cart = useSelector((state: RootState) => state.cart.cart) || [];
   const [deliveryCharges, setDeliveryCharges] = useState(0)
-  const itemsPrice =  cart.reduce((total, item) => total + item.product_price * item.quantity, 0);
-  const totalPrice = cart.reduce((total, item) => total + (item.product_price * item.quantity) + deliveryCharges, 0);
+  const itemsPrice = cart.reduce((total, item) => total + item.product_price * item.quantity, 0);
+  const totalPrice = itemsPrice + deliveryCharges;
 
   const [customerName, setCustomerName] = useState(customer.name);
   const [mobileNumber, setMobileNumber] = useState(customer.mobile_number);
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedDeliveryPoint, setSelectedDeliveryPoint] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState(new Date().toISOString().split("T")[0]);
+
+  const getMinDeliveryDate = () => {
+    const now = new Date();
+    now.setHours(now.getHours() + 48); // Add 48 hours
+
+    // Adjust to the next morning (8:00 AM)
+    if (now.getHours() >= 8) {
+      now.setDate(now.getDate() + 1);
+    }
+    now.setHours(8, 0, 0, 0); // Set time to 8 AM
+
+    return now.toISOString().split("T")[0]; // Convert to YYYY-MM-DD
+  };
+  const [deliveryDate, setDeliveryDate] = useState(getMinDeliveryDate());
+
+  useEffect(() => {
+    setDeliveryDate(getMinDeliveryDate());
+  }, []);
 
 
   const cities = [
-    { name: "Hyderabad", deliveryPoints: ["JNTU", "MG Bus Stand", "Miyapur"], deliveryCharges:100 },
-    { name: "Chennai", deliveryPoints: ["Koyambedu", "Tambaram", "Guindy"],  deliveryCharges:150 },
-    { name: "Bangalore", deliveryPoints: ["Majestic", "KR Market", "Electronic City"], deliveryCharges:200 },
+    { name: "Hyderabad", deliveryPoints: ["JNTU", "MG Bus Stand", "Miyapur"], deliveryCharges: 100 },
+    { name: "Chennai", deliveryPoints: ["Koyambedu", "Tambaram", "Guindy"], deliveryCharges: 150 },
+    { name: "Bangalore", deliveryPoints: ["Majestic", "KR Market", "Electronic City"], deliveryCharges: 200 },
   ];
 
 
@@ -97,27 +138,6 @@ const Cart = () => {
         body: JSON.stringify({ amount: totalPrice }),
       });
       const data = await response.json();
-      interface RazorpayOptions {
-        key: string;
-        amount: number;
-        currency: string;
-        name: string;
-        description: string;
-        order_id: string;
-        handler: (response: RazorpayResponse) => Promise<void>;
-        prefill: {
-          name: string;
-          contact: string;
-        };
-        theme: {
-          color: string;
-        };
-      }
-
-      interface RazorpayResponse {
-        razorpay_payment_id: string;
-        razorpay_signature: string;
-      }
 
       const options: RazorpayOptions = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID as string,
@@ -197,6 +217,7 @@ const Cart = () => {
               selectedCity={selectedCity}
               selectedDeliveryPoint={selectedDeliveryPoint}
               deliveryDate={deliveryDate}
+              getMinDeliveryDate={getMinDeliveryDate}
               setCustomerName={setCustomerName}
               setMobileNumber={setMobileNumber}
               setSelectedCity={setSelectedCity}
