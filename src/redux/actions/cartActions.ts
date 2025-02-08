@@ -17,25 +17,6 @@ interface AddItemAction {
     payload: CartItem;
 }
 
-export const addItemToCart = (item: CartItem): AddItemAction => {
-    return {
-        type: ADD_ITEM,
-        payload: item,
-    };
-};
-
-// Action to remove item from the cart
-interface RemoveItemAction {
-    type: typeof REMOVE_ITEM;
-    payload: CartItem;
-}
-
-export const removeItemFromCart = (itemName: string) => {
-    return {
-        type: REMOVE_ITEM,
-        payload: itemName,
-    };
-};
 
 // Action to update the quantity of an item in the cart
 interface UpdateQuantityAction {
@@ -45,6 +26,24 @@ interface UpdateQuantityAction {
         quantity: number;
     };
 }
+
+export const addItemToCart = (item: CartItem): AddItemAction => {
+    return {
+        type: ADD_ITEM,
+        payload: item,
+    };
+};
+
+
+
+export const removeItemFromCart = (itemName: string) => {
+    return {
+        type: REMOVE_ITEM,
+        payload: itemName,
+    };
+};
+
+
 
 export const updateItemQuantity = (item: CartItem, quantity: number): UpdateQuantityAction => {
     return {

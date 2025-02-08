@@ -1,6 +1,7 @@
 // components/CartItem.tsx
 import { useDispatch } from "react-redux";
 import { removeItemFromCart, updateItemQuantity } from "../../redux/actions/cartActions";
+import Image from "next/image"
 
 interface CartItemProps {
   product_id: string;
@@ -29,11 +30,7 @@ const CartItem = (cartItem: CartItemProps) => {
   return (
     <div className="flex justify-between items-center bg-white p-4 rounded shadow mb-4">
 
-      <img
-        src={product_image_url}
-        alt={product_name}
-        className="w-20 h-20 object-cover rounded"
-      />
+      <Image src ={product_image_url} alt={product_name} width={50} height={50}/>
       <p className="font-semibold">{product_name}</p>
       <div className="flex items-center space-x-2">
         <button

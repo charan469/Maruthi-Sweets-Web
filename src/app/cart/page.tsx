@@ -43,10 +43,15 @@ const Cart = () => {
       alert("Please fill all the delivery details.");
       return;
     }
-
+    // Transform cart items to match expected OrderDetails type
+    const transformedCartItems = cart.map(item => ({
+      product_name: item.product_name,
+      quantity: item.quantity,
+      price: item.product_price, // Renaming product_price to price
+    }));
     // Prepare the order object
     const orderDetails = {
-      cartItems: cart,
+      cartItems: transformedCartItems, // Use transformed structure
       deliveryDetails: {
         customerName,
         mobileNumber,
@@ -57,7 +62,7 @@ const Cart = () => {
       sellerPhone: "9989325599",
       totalPrice,
       orderDate: new Date().toISOString(),
-      orderStatus: "placed",
+      orderStatus: "New Order",
     };
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}orders`, {
@@ -69,8 +74,7 @@ const Cart = () => {
       const data = await response.json();
       if (data.message === "Order placed successfully.") {
         console.log("Order placed successfully:", data.order);
-        dispatch(saveOrder(orderDetails)); // Dispatch action to save order in Redux
-        // Clear the cart
+        dispatch(saveOrder(orderDetails)); // Dispatch action with correct structure
         cart.forEach((item) => dispatch(removeItemFromCart(item.product_name)));
         alert("Order placed successfully!");
         router.push("/history");

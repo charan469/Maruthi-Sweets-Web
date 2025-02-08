@@ -1,21 +1,50 @@
+
+
+interface OrderDetails {
+  cartItems: {
+    product_name: string;
+    quantity: number;
+    price: number;
+  }[];
+  deliveryDetails: {
+    customerName: string;
+    mobileNumber: string;
+    city: string;
+    deliveryPoint: string;
+    deliveryDate: string;
+  };
+  sellerPhone: string;
+  totalPrice: number;
+  orderDate: string;
+  orderStatus: string;
+}
+
+interface OrderState {
+  orderHistory: OrderDetails[];
+}
+
+interface SaveOrderAction {
+  type: typeof SAVE_ORDER;
+  payload: OrderDetails;
+}
+
+type OrderActions = SaveOrderAction;
+
 const SAVE_ORDER = "SAVE_ORDER";
 
-export const saveOrder = (orderDetails: any) => {
+export const saveOrder = (orderDetails: OrderDetails) => {
   return {
     type: SAVE_ORDER,
     payload: orderDetails,
   };
 };
 
-interface OrderState {
-  orderHistory: any[];
-}
 
 const initialState: OrderState = {
   orderHistory: [],
 };
 
-const orderHistoryReducer = (state = initialState, action: { type: string; payload: any }) => {
+const orderHistoryReducer = (state = initialState, action: OrderActions): OrderState => {
   switch (action.type) {
     case SAVE_ORDER:
       return {
