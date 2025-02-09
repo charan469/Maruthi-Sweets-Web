@@ -79,7 +79,7 @@ const Home = () => {
                             <div key={product.product_id} className="bg-white rounded-lg shadow-md p-4">
                                 <div className="flex items-center justify-center">
                                     <div className="w-32 h-32">
-                                        <Image src={product.product_image_url} alt={product.product_name}  className="w-full h-full object-cover rounded" width={50} height={50} unoptimized/>
+                                        <Image src={product.product_image_url} alt={product.product_name}  className="w-full h-full object-cover rounded" width={50} height={50} layout="fixed"/>
                                     </div>
                                 </div>
                                 <h3 className="text-sm font-semibold mt-2 text-center">{product.product_name}</h3>

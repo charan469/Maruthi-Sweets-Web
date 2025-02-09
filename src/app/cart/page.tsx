@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart } from "../../redux/actions/cartActions";
 import { saveOrder } from "@/redux/reducers/orderHistoryReducer";
@@ -66,12 +66,6 @@ const Cart = () => {
     return now.toISOString().split("T")[0]; // Convert to YYYY-MM-DD
   };
   const [deliveryDate, setDeliveryDate] = useState(getMinDeliveryDate());
-
-  useEffect(() => {
-    setDeliveryDate(getMinDeliveryDate());
-  }, []);
-
-
   const cities = [
     { name: "Hyderabad", deliveryPoints: ["JNTU", "MG Bus Stand", "Miyapur"], deliveryCharges: 100 },
     { name: "Chennai", deliveryPoints: ["Koyambedu", "Tambaram", "Guindy"], deliveryCharges: 150 },
@@ -84,15 +78,9 @@ const Cart = () => {
       alert("Please fill all the delivery details.");
       return;
     }
-    // Transform cart items to match expected OrderDetails type
-    const transformedCartItems = cart.map(item => ({
-      product_name: item.product_name,
-      quantity: item.quantity,
-      price: item.product_price, // Renaming product_price to price
-    }));
     // Prepare the order object
     const orderDetails = {
-      cartItems: transformedCartItems, // Use transformed structure
+      cartItems: cart,
       deliveryDetails: {
         customerName,
         mobileNumber,
@@ -198,7 +186,7 @@ const Cart = () => {
             <p className="text-center text-gray-600">Your cart is empty.</p>
             <Link href="/home">
               <button className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all">
-                Home
+               Go to Home
               </button>
             </Link>
           </div>

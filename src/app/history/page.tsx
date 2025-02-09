@@ -114,7 +114,6 @@ const OrderHistory: React.FC = () => {
                                         width={50}
                                         height={50}
                                         style={{ borderRadius: "8px" }}
-                                        unoptimized
                                     />
                                     <p>
                                         {item.product_name} x {item.quantity} = Rs.{" "}

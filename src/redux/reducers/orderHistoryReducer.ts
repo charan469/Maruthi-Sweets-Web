@@ -4,7 +4,8 @@ interface OrderDetails {
   cartItems: {
     product_name: string;
     quantity: number;
-    price: number;
+    product_price: number;
+    product_image_url: string;
   }[];
   deliveryDetails: {
     customerName: string;

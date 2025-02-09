@@ -6,30 +6,31 @@ import hanumanLogo from "../../../assets/hanuman-logo.png";
 import {  useSelector } from 'react-redux';
 import { History, ShoppingCart } from 'lucide-react';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+    showIcons?: boolean; // Default to true, hide only on login page
+}
+
+const Header: React.FC<HeaderProps> = ({ showIcons = true }) => {
+
     interface CartItem {
-        id: number;
-        name: string;
         quantity: number;
-        price: number;
     }
 
     const cart = useSelector((state: { cart: { cart: CartItem[] } }) => state.cart.cart);
 
     return (
-        <header className="flex items-center justify-between px-4 py-3 bg-white shadow-md">
+        <header className="flex items-center justify-between px-4 py-3 bg-white shadow-xl">
             <div className="flex items-center space-x-4">
                 <Image
                     src={hanumanLogo}
                     alt="Hanuman Logo"
                     width={30}
                     height={30}
-                /> <nav>
-                        <Link href="/home">
+                /> 
                 <h1 className="text-2xl font-semibold">Sri Maruthi Sweets</h1>
-                </Link>
-            </nav>
+              
             </div>
+            { showIcons &&
             <div className="flex items-center space-x-4">
                 <nav>
                     <Link href="/history">
@@ -49,6 +50,7 @@ const Header: React.FC = () => {
                     )}
                 </div>
             </div>
+}
         </header>
     );
 };
